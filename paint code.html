@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<title>Painting</title>
+<head>
+<style type="text/css">
+body {
+    background: #fff;
+    font-family: sans-serif;
+  text-align: center;
+}
+h1 {
+  margin: auto;
+  font-weight: 300;
+}
+canvas {
+    background: #fff;
+    display: block;
+    margin: 30px auto 10px;
+    border: 1px solid black;
+    box-shadow: 0 4px 5px 0 #222;
+  cursor: crosshair;
+}
+.controls {
+    min-height: 60px;
+    margin: 0 auto;
+    width: 600px;
+    border-radius: 5px;
+    overflow: hidden;
+}
+ul {
+    list-style:none;
+    margin: 0;
+    float:  left;
+    padding: 10px 0 20px;
+    width: 100%;
+    text-align: center;
+}
+
+ul li, #newColor {
+    display:block;
+    height: 54px;
+    width: 54px;
+    border-radius: 60px;
+    cursor: pointer;
+    border: 0;
+}
+
+ul li {
+    display: inline-block;
+    margin: 0 5px 10px;
+
+}
+
+.red {
+    background: #fc4c4f;
+}
+
+.blue {
+    background: #4fa3fc;
+}
+
+.yellow {
+    background: #ECD13F;
+}
+
+.selected {
+    box-shadow: 0px 0px 10px 5px #222;
+    width: 54px;
+    height: 54px;
+}
+
+#thickness-section {
+  display: inline-block;
+  margin: auto;
+  text-align: center;
+}
+
+button {
+    background: #fff;
+    box-shadow: 0 4px 5px 0 #222;
+    color: #000;
+    outline: none;
+    cursor: pointer;
+    display: block;
+    font-size: 16px;
+    line-height: 40px;
+}
+
+/* New Color Palette */
+#colorSelect {
+    background: #fff;
+    border: 1px solid black;
+    clear: both;
+    margin: 20px auto 0;
+    padding: 10px;
+    width: 305px;
+    position: relative;
+  display:none;
+}
+#colorSelect:after {
+    bottom: 100%;
+    left: 50%;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
+    border-width: 10px;
+    margin-left: -10px;
+}
+
+#newColor {
+    width: 80px;
+    height: 80px;
+    border-radius: 3px;
+    box-shadow: none;
+    float: left;
+    border: none;
+    margin: 10px 20px 20px 10px;
+
+}
+.sliders p {
+    margin: 8px 0;
+    vertical-align: middle;
+}
+.sliders label {
+    display: inline-block;
+    margin: 0 10px 0 0;
+    width: 35px;
+    font-size: 14px;
+    color: #6D574E;
+}
+.sliders input {
+    position: relative;
+    top: 2px;
+}
+#colorSelect button {
+    border: none;
+    border-top: 1px solid #6A845F;
+    clear: both;
+    margin: 10px -10px -7px;
+    padding: 5px 10px;
+    width: 325px;
+}
+</style>
+</head>
+<body><h1>Painting Canvas</h1>
+    <canvas  width="600" height="400"></canvas>
+    <div class="controls">
+        <ul>
+            <li class="red selected"></li>
+            <li class="blue"></li>
+            <li class="yellow"></li>
+        </ul>
+    <p id="thickness-section">
+      <label for"thickness">Customize Thickness</label>
+      <input id="thickness" name="thickness" type="range" min=1 max=100 value=1>
+    </p><br>
+        
+        <div id="colorSelect">
+            <span id="newColor"></span>
+            <div class="sliders">
+                <p>
+                    <label for="red">Red</label>
+                    <input class="color-sliders" id="red" name="red" type="range" min=0 max=255 value=0>
+                </p>
+                <p>
+                    <label for="green">Green</label>
+                    <input class="color-sliders" id="green" name="green" type="range" min=0 max=255 value=0>
+                </p>
+                <p>
+                    <label for="blue">Blue</label>
+                    <input class="color-sliders" id="blue" name="blue" type="range" min=0 max=255 value=0>
+                </p>
+            </div>
+            <div>
+            <button id="addNewColor">Add Color</button>
+            </div>
+        </div>
+
+    </div>
+    <script src="https://code.jquery.com/jquery-1.11.0.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/app.js" type="text/javascript" charset="utf-8"></script>
+
+</body>
+<script>
+    var color = $(".selected").css("background-color");
+var $canvas = $("canvas");
+var context = $canvas[0].getContext("2d");
+var lastEvent;
+var mouseDown = false;
+
+
+//When clicking on control list items
+$(".controls").on("click", "li", function(){
+  //deselect sibling elements
+  $(this).siblings().removeClass("selected");
+  //select clicked element
+  $(this).addClass("selected");
+  //cache current color here
+  color = $(this).css("background-color");
+});
+
+  //When "new color" is pressed
+
+//update color span
+function changeColor(){
+  var r = $("#red").val();
+  var g = $("#green").val();
+  var b = $("#blue").val();
+  $("#newColor").css("background-color", "rgb(" + r + "," + g + "," + b + ")");
+}
+//When color sliders change
+$(".color-sliders[type=range]").change(changeColor);
+
+
+//when "add color" is pressed
+$("#addNewColor").click(function(){
+  //append the color to the controls ul
+  var $newColor = $("<li></li>");
+  $newColor.css("background-color", $("#newColor").css("background-color"));
+  $(".controls ul").append($newColor);
+  //select the new color
+  $newColor.click();
+});
+
+//on mouse events on the canvas
+
+//change thickness
+$("#thickness").on("input", function() {
+    context.lineWidth = $("#thickness").val();
+});
+//round brush strokes
+context.lineCap = "round";
+
+$canvas.mousedown(function(e){
+  lastEvent = e;
+  mouseDown = true;
+}).mousemove(function(e){
+  //draw lines
+  if(mouseDown) {
+    context.beginPath();
+    context.moveTo(lastEvent.offsetX, lastEvent.offsetY);
+    context.lineTo(e.offsetX, e.offsetY);
+    context.strokeStyle = color;
+    context.stroke();
+    lastEvent = e;
+   }
+}).mouseup(function(){
+  mouseDown = false;
+}).mouseleave(function(){
+  $canvas.mouseup();
+});
+</script>
+</html>
