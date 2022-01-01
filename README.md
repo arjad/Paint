@@ -1,4 +1,5 @@
 # Paint
 simple html css pain app 
+with effect mouse effect and animation
 
-https://boring-lichterman-2edcc6.netlify.app/
+https://keen-brattain-d0ea6f.netlify.app/
